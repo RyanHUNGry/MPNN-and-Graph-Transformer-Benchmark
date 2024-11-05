@@ -14,20 +14,22 @@ Graph-level classification will apply a global mean pooling to the node embeddin
 Tunable model hyperparameters include the number of hidden channels.
 """
 class GCN(torch.nn.Module):
-    def __init__(self, data, hidden_channels=16):
+    def __init__(self, data, hidden_channels=16, hidden_layers=2):
         super().__init__()
-
         if not type(data) is Data:
             self.conv1 = GCNConv(data.num_node_features, hidden_channels)
-            self.conv2 = GCNConv(hidden_channels, hidden_channels)
+            self.convs = torch.nn.ModuleList()
+            for i in range(hidden_layers - 1):
+                self.convs.append(GCNConv(hidden_channels, hidden_channels))
             self.lin = torch.nn.Linear(hidden_channels, data.num_classes)
-            return
-
-        num_classes = len(data.y.unique())
-        num_node_features = data.num_node_features
-        
-        self.conv1 = GCNConv(num_node_features, hidden_channels)
-        self.conv2 = GCNConv(hidden_channels, num_classes)
+        else:
+            num_classes = len(data.y.unique())
+            num_node_features = data.num_node_features
+            
+            self.conv1 = GCNConv(num_node_features, hidden_channels)
+            self.convs = torch.nn.ModuleList()
+            for i in range(hidden_layers - 1):
+                self.convs.append(GCNConv(hidden_channels, hidden_channels if i != hidden_layers - 2 else num_classes))
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
@@ -35,7 +37,11 @@ class GCN(torch.nn.Module):
         x = self.conv1(x, edge_index)
         x = F.relu(x)
         x = F.dropout(x, training=self.training)
-        x = self.conv2(x, edge_index)
+
+        for conv in self.convs:
+            x = conv(x, edge_index)
+            x = F.relu(x)
+            x = F.dropout(x, training=self.training)
 
         if not type(data) is Data:
             x = F.relu(x)

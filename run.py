@@ -9,7 +9,7 @@ def main():
     run_gat_benchmarks()
 
 def run_gat_benchmarks():
-    print()
+    print("Running GAT Benchmarks")
     cora_data = loader.load_clean_cora()
     gat_model = gat.GAT(cora_data)
     gat.train(gat_model, cora_data)

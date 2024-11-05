@@ -15,7 +15,7 @@ Graph-level classification will apply a summation readout on final node embeddin
 Tunable model hyperparameters include the number of hidden channels and hidden layers.
 """
 class GAT(torch.nn.Module):
-    def __init__(self, data, hidden_channels=8, heads=8):
+    def __init__(self, data, hidden_channels=8, heads=8, hidden_layers=2):
         super().__init__()
 
         if type(data) is Data:
@@ -23,27 +23,33 @@ class GAT(torch.nn.Module):
             num_node_features = data.num_node_features
 
             self.conv1 = GATConv(num_node_features, hidden_channels, heads=heads)
-            self.conv2 = GATConv(hidden_channels*heads, num_classes, heads=1)
+            self.convs = torch.nn.ModuleList()
+            for i in range(hidden_layers - 1):
+                self.convs.append(GATConv(hidden_channels*heads, hidden_channels if i != hidden_layers - 2 else num_classes, heads=heads if i != hidden_layers - 2 else 1))
         else:
-            self.conv1 = GATConv(data.num_node_features, hidden_channels, heads=heads)
-            self.conv2 = GATConv(hidden_channels*heads, data.num_classes, heads=1)
+            self.conv1 = GATConv(num_node_features, hidden_channels, heads=heads)
+            self.convs = torch.nn.ModuleList()
+            for i in range(hidden_layers - 1):
+                self.convs.append(GATConv(hidden_channels*heads, hidden_channels if i != hidden_layers - 2 else data.num_classes, heads=heads if i != hidden_layers - 2 else 1))
             self.lin = Linear(data.num_classes, data.num_classes)
 
     def forward(self, data):
         if type(data) is Data:
             x, edge_index = data.x, data.edge_index
-            
+
             x = self.conv1(x, edge_index)
-            x = F.elu(x)
-            x = self.conv2(x, edge_index)
+            for conv in self.convs:
+                F.elu(x)
+                x = conv(x, edge_index)
             
             return F.log_softmax(x, dim=1)
         else:
             x, edge_index, batch = data.x, data.edge_index, data.batch
 
             x = self.conv1(x, edge_index)
-            x = F.elu(x)
-            x = self.conv2(x, edge_index)
+            for conv in self.convs:
+                F.elu(x)
+                x = conv(x, edge_index)
 
             x = global_add_pool(x, batch)
             x = F.dropout(x, training=self.training)
