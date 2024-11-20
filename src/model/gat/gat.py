@@ -15,11 +15,10 @@ Graph-level classification will apply a summation readout on final node embeddin
 Tunable model hyperparameters include the number of hidden channels and hidden layers.
 """
 class GAT(torch.nn.Module):
-    def __init__(self, data, hidden_channels=8, heads=8, hidden_layers=2):
+    def __init__(self, data, num_classes, hidden_channels=8, heads=8, hidden_layers=2):
         super().__init__()
 
         if type(data) is Data:
-            num_classes = len(data.y.unique())
             num_node_features = data.num_node_features
 
             self.conv1 = GATConv(num_node_features, hidden_channels, heads=heads)
@@ -27,11 +26,11 @@ class GAT(torch.nn.Module):
             for i in range(hidden_layers - 1):
                 self.convs.append(GATConv(hidden_channels*heads, hidden_channels if i != hidden_layers - 2 else num_classes, heads=heads if i != hidden_layers - 2 else 1))
         else:
-            self.conv1 = GATConv(num_node_features, hidden_channels, heads=heads)
+            self.conv1 = GATConv(data.num_node_features, hidden_channels, heads=heads)
             self.convs = torch.nn.ModuleList()
             for i in range(hidden_layers - 1):
-                self.convs.append(GATConv(hidden_channels*heads, hidden_channels if i != hidden_layers - 2 else data.num_classes, heads=heads if i != hidden_layers - 2 else 1))
-            self.lin = Linear(data.num_classes, data.num_classes)
+                self.convs.append(GATConv(hidden_channels*heads, hidden_channels if i != hidden_layers - 2 else num_classes, heads=heads if i != hidden_layers - 2 else 1))
+            self.lin = Linear(num_classes, num_classes)
 
     def forward(self, data):
         if type(data) is Data:

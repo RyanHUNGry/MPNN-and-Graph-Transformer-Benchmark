@@ -15,10 +15,9 @@ Graph-level classification will apply a summation readout for each node embeddin
 Tunable model hyperparameters include the number of hidden channels and hidden layers.
 """
 class GIN(torch.nn.Module):
-    def __init__(self, data, hidden_channels=16, hidden_layers=5):
+    def __init__(self, data, num_classes, hidden_channels=16, hidden_layers=5):
         super().__init__()
 
-        num_classes = len(data.y.unique())
         num_node_features = data.num_node_features
 
         self.conv1 = GINConv(
@@ -50,7 +49,7 @@ class GIN(torch.nn.Module):
             return
         else:
             self.lin1 = Linear(hidden_channels*hidden_layers, hidden_channels*hidden_layers)
-            self.lin2 = Linear(hidden_channels*hidden_layers, data.num_classes)
+            self.lin2 = Linear(hidden_channels*hidden_layers, num_classes)
             return
 
     def forward(self, data):

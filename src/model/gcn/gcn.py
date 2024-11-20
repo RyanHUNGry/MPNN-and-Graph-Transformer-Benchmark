@@ -14,14 +14,14 @@ Graph-level classification will apply a global mean pooling to the node embeddin
 Tunable model hyperparameters include the number of hidden channels.
 """
 class GCN(torch.nn.Module):
-    def __init__(self, data, hidden_channels=16, hidden_layers=2):
+    def __init__(self, data, num_classes, hidden_channels=16, hidden_layers=2):
         super().__init__()
         if not type(data) is Data:
             self.conv1 = GCNConv(data.num_node_features, hidden_channels)
             self.convs = torch.nn.ModuleList()
             for i in range(hidden_layers - 1):
                 self.convs.append(GCNConv(hidden_channels, hidden_channels))
-            self.lin = torch.nn.Linear(hidden_channels, data.num_classes)
+            self.lin = torch.nn.Linear(hidden_channels, num_classes)
         else:
             num_classes = len(data.y.unique())
             num_node_features = data.num_node_features
