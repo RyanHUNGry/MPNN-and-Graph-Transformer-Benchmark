@@ -1,4 +1,5 @@
 from torch import ones, unique, tensor, long, randperm, zeros
+from torch_geometric.transforms import Compose, AddLaplacianEigenvectorPE
 
 def generate_masks(num_nodes, train_ratio, val_ratio):
     # Generate a random permutation of node indices
