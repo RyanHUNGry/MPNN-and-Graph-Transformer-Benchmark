@@ -87,7 +87,7 @@ def train(gin, data):
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(gin.parameters(), lr=0.01, weight_decay=5e-4)
     gin.train()
-    for _ in range(200):
+    for epoch in range(100):
         if not type(data) is Data:
             for batch in data:
                 out = gin(batch)

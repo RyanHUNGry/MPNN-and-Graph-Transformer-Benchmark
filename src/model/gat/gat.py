@@ -53,13 +53,13 @@ class GAT(torch.nn.Module):
             x = global_add_pool(x, batch)
             x = F.dropout(x, training=self.training)
             x = self.lin(x)
-            return x
+            return F.log_softmax(x, dim=1)
 
 def train(gat, data):
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(gat.parameters(), lr=0.01, weight_decay=5e-4)
     gat.train()
-    for _ in range(200):
+    for epoch in range(100):
         if not type(data) is Data:
             for batch in data:
                 out = gat(batch)

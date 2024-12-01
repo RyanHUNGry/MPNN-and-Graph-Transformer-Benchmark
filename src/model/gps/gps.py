@@ -1,7 +1,8 @@
 import torch
 from torch.nn import ModuleList, Linear, LogSoftmax
-from torch_geometric.nn import GCNConv, GPSConv
+from torch_geometric.nn import GCNConv, GPSConv, global_add_pool
 from torch_geometric.datasets import Planetoid
+from torch_geometric.data.data import Data
 
 import torch.nn as nn
 
@@ -13,7 +14,7 @@ The GPS class and train/test methods, by default, performs node-level classifica
 type to determine whether to perform graph-level classification if data is not an instance of torch_geometric.data.data.Data.
 Graph-level classification will apply a summation readout for each node embedding at each layer, and then concatenate the readouts.
 
-Tunable model hyperparameters include the number of hidden channels, hidden layers, positional encoding channels, and number of attention heads.
+Tunable model hyperparameters include the number of hidden channels, positional encoding channels, attention heads, and hidden layers.
 """
 class GPS(torch.nn.Module):
     def __init__(self, data, num_classes, hidden_channels, pe_channels=4, num_attention_heads=1, num_layers=2):
@@ -33,14 +34,30 @@ class GPS(torch.nn.Module):
         self.lin = Linear(hidden_channels, num_classes)
         self.output = LogSoftmax(dim=1)
 
+        if type(data) is not Data:
+            self.readout = global_add_pool
+            return
+
     def forward(self, data):
-        x, edge_index, laplacian_eigenvector_pe = data.x, data.edge_index, data.laplacian_eigenvector_pe
-        pe = self.pe_lin(laplacian_eigenvector_pe)
+        x, edge_index = data.x, data.edge_index
+
+        # concatenate positional encodings
+        pe = torch.empty(x.shape[0], 0)
+        if hasattr(data, "random_walk_pe"):
+            pe = torch.cat([pe, data.random_walk_pe], dim=1)
+        if hasattr(data, "laplacian_eigenvector_pe"):
+            pe = torch.cat([pe, data.laplacian_eigenvector_pe], dim=1)
+
+        pe = self.pe_lin(pe)
         pe = self.pe_norm(pe)
         x = self.input_lin(x)
         x = torch.cat((x, pe), dim=1)
         for layer in self.layers:
             x = layer(x, edge_index)
+        
+        if type(data) is not Data:
+            x = self.readout(x, data.batch)
+
         x = self.lin(x)
         x = self.output(x)
         return x
@@ -50,15 +67,29 @@ def train(gps, data):
     optimizer = torch.optim.Adam(gps.parameters(), lr=0.01, weight_decay=5e-4)
     gps.train()
     for epoch in range(100):
-        print(epoch)
-        out = gps(data)
-        loss = criterion(out[data.train_mask], data.y[data.train_mask])
-        loss.backward()
-        optimizer.step()
-        optimizer.zero_grad()
-    
+        if type(data) is not Data:
+            for batch in data:
+                out = gps(batch)
+                loss = criterion(out, batch.y)
+                loss.backward()
+                optimizer.step()
+                optimizer.zero_grad()
+        else:
+            out = gps(data)
+            loss = criterion(out[data.train_mask], data.y[data.train_mask])
+            loss.backward()
+            optimizer.step()
+            optimizer.zero_grad()
+
 def test(gps, data):
     gps.eval()
+    if type(data) is not Data:
+        correct = 0
+        for batch in data:
+            out = gps(batch)  
+            pred = out.argmax(dim=1)
+            correct += int((pred == batch.y).sum())
+        return correct / len(data.dataset)
     pred = gps(data).argmax(dim=1)
     test_correct = (pred[data.test_mask] == data.y[data.test_mask]).sum()
     test_acc = int(test_correct) / int(data.test_mask.sum())
