@@ -5,9 +5,9 @@ from src.model.gat import gat
 from src.model.gps import gps
 
 def main():
-    # run_gcn_benchmarks()
-    # run_gin_benchmarks()
-    # run_gat_benchmarks()
+    run_gcn_benchmarks()
+    run_gin_benchmarks()
+    run_gat_benchmarks()
     run_gps_benchmarks()
 
 def run_gps_benchmarks():
@@ -20,12 +20,12 @@ def run_gps_benchmarks():
     print(f'Train Accuracy for Cora node-level classification: {train_acc}')
     print(f'Test Accuracy for Cora node-level classification: {test_acc}')
 
-    # pascalvoc_sp_data, num_classes = loader.load_pascalvoc_sp()
-    # gat_model = gps.gps(pascalvoc_sp_data, num_classes)
-    # gps.train(gps_model, pascalvoc_sp_data)
-    # train_acc, test_acc = gps.test(gps_model, pascalvoc_sp_data)
-    # print(f'Train Accuracy for PascalVOC-SP node-level classification: {train_acc}')
-    # print(f'Test Accuracy for PascalVOC-SP node-level classification: {test_acc}')
+    pascalvoc_sp_data, num_classes = loader.load_pascalvoc_sp()
+    gat_model = gps.gps(pascalvoc_sp_data, num_classes)
+    gps.train(gps_model, pascalvoc_sp_data)
+    train_acc, test_acc = gps.test(gps_model, pascalvoc_sp_data)
+    print(f'Train Accuracy for PascalVOC-SP node-level classification: {train_acc}')
+    print(f'Test Accuracy for PascalVOC-SP node-level classification: {test_acc}')
 
     enzymes_dataset, enzymes_train_loader, enzymes_test_loader = loader.load_clean_enzymes()
     gps_model = gps.gps(enzymes_dataset, enzymes_dataset.num_classes)
@@ -33,11 +33,11 @@ def run_gps_benchmarks():
     print(f'Train Accuracy for Enzymes graph-level classification: {gps.test(gps_model, enzymes_train_loader)}')
     print(f'Test Accuracy for Enzymes graph-level classification: {gps.test(gps_model, enzymes_test_loader)}')
 
-    # imdb_dataset, imdb_train_loader, imdb_test_loader = loader.load_clean_imdb()
-    # gps_model = gps.gps(imdb_dataset, imdb_dataset.num_classes)
-    # gps.train(gps_model, imdb_train_loader)
-    # print(f'Train Accuracy for IMDB graph-level classification: {gps.test(gps_model, imdb_train_loader)}')
-    # print(f'Test Accuracy for IMDB graph-level classification: {gps.test(gps_model, imdb_test_loader)}')
+    imdb_dataset, imdb_train_loader, imdb_test_loader = loader.load_clean_imdb()
+    gps_model = gps.gps(imdb_dataset, imdb_dataset.num_classes)
+    gps.train(gps_model, imdb_train_loader)
+    print(f'Train Accuracy for IMDB graph-level classification: {gps.test(gps_model, imdb_train_loader)}')
+    print(f'Test Accuracy for IMDB graph-level classification: {gps.test(gps_model, imdb_test_loader)}')
 
     print("-----------------------------------") 
 
