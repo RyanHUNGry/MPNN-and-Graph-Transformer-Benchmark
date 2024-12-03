@@ -5,10 +5,38 @@ from src.model.gat import gat
 from src.model.gps import gps
 
 def main():
+    run_gat_versus_gcn_benchmarks() # Model performance with respect to # of hidden layers
     run_gcn_benchmarks()
     run_gin_benchmarks()
     run_gat_benchmarks()
     run_gps_benchmarks()
+
+def run_gat_versus_gcn_benchmarks():
+    print("Running GAT vs GCN Benchmarks")
+
+    cora_data, num_classes = loader.load_clean_cora()
+    hidden_layers = [2, 4, 6, 8]
+    gcn_train_test_accs, gat_train_test_accs = [None] * 4, [None] * 4
+    for i, hidden_layer in enumerate(hidden_layers):
+        gat_model = gat.GAT(cora_data, num_classes, hidden_layers=hidden_layer)
+        gat.train(gat_model, cora_data)
+        train_acc, test_acc = gat.test(gat_model, cora_data)
+        gat_train_test_accs[i] = (train_acc, test_acc)
+
+        gcn_model = gcn.GCN(cora_data, num_classes, hidden_layers=hidden_layer)
+        gcn.train(gcn_model, cora_data)
+        train_acc, test_acc = gcn.test(gcn_model, cora_data)
+        gcn_train_test_accs[i] = (train_acc, test_acc)
+
+    for i, hidden_layer in enumerate(hidden_layers):
+        print(f'Hidden Layers: {hidden_layer}')
+        print(f'GAT Train Accuracy: {gat_train_test_accs[i][0]}')
+        print(f'GAT Test Accuracy: {gat_train_test_accs[i][1]}')
+        print(f'GCN Train Accuracy: {gcn_train_test_accs[i][0]}')
+        print(f'GCN Test Accuracy: {gcn_train_test_accs[i][1]}')
+        print("-----------------------------------")
+
+    print("-----------------------------------")
 
 def run_gps_benchmarks():
     print("Running GPS Benchmarks")

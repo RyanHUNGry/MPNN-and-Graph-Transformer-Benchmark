@@ -19,7 +19,6 @@ def load_clean_imdb():
 
     imdb_train_dataset = imdb_dataset[:750]
     imdb_test_dataset = imdb_dataset[750:]
-
     imdb_train_loader = DataLoader(imdb_train_dataset, batch_size=96, shuffle=False)
     imdb_test_loader = DataLoader(imdb_test_dataset, batch_size=96, shuffle=False)
 
@@ -27,7 +26,6 @@ def load_clean_imdb():
 
 def load_clean_enzymes():
     enzymes_dataset = TUDataset(root=os.path.join(root_path, 'TUDataset'), name='ENZYMES', pre_transform=Compose([AddRandomWalkPE(5)])).shuffle()
-
     enzymes_train_dataset = enzymes_dataset[:450]
     enzymes_test_dataset = enzymes_dataset[450:]
 
