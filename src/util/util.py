@@ -1,5 +1,10 @@
 from torch import ones, unique, tensor, long, randperm, zeros
-from torch_geometric.transforms import Compose, AddLaplacianEigenvectorPE
+import json
+
+def load_model_config(filename):
+    with open(filename, 'r') as file:
+        model_config = json.load(file)
+    return model_config
 
 def generate_masks(num_nodes, train_ratio, val_ratio):
     # Generate a random permutation of node indices

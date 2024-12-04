@@ -86,4 +86,8 @@ def test(gcn, data):
     test_acc = int(test_correct) / int(data.test_mask.sum())
     train_correct = (pred[data.train_mask] == data.y[data.train_mask]).sum()
     train_acc = int(train_correct) / data.train_mask.sum()
+    if isinstance(train_acc, torch.Tensor):
+        train_acc = train_acc.item()
+    if isinstance(test_acc, torch.Tensor):
+        test_acc = test_acc.item()
     return train_acc, test_acc

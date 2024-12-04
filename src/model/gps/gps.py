@@ -17,7 +17,7 @@ Graph-level classification will apply a summation readout for each node embeddin
 Tunable model hyperparameters include the number of hidden channels, positional encoding channels, attention heads, and hidden layers.
 """
 class GPS(torch.nn.Module):
-    def __init__(self, data, num_classes, hidden_channels, pe_channels=4, num_attention_heads=1, num_layers=2):
+    def __init__(self, data, num_classes, hidden_channels=4, pe_channels=4, num_attention_heads=1, num_layers=2):
         super().__init__()
         
         self.pe_lin = nn.Linear(pe_channels, hidden_channels)
@@ -95,4 +95,8 @@ def test(gps, data):
     test_acc = int(test_correct) / int(data.test_mask.sum())
     train_correct = (pred[data.train_mask] == data.y[data.train_mask]).sum()
     train_acc = int(train_correct) / data.train_mask.sum()
+    if isinstance(train_acc, torch.Tensor):
+        train_acc = train_acc.item()
+    if isinstance(test_acc, torch.Tensor):
+        test_acc = test_acc.item()
     return train_acc, test_acc

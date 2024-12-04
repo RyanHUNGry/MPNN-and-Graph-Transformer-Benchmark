@@ -1,0 +1,86 @@
+{
+    "GAT": {
+        "Cora": {
+            "hidden_channels": 8,
+            "heads": 8,
+            "hidden_layers": 2
+        },
+        "IMDB-BINARY": {
+            "hidden_channels": 8,
+            "heads": 8,
+            "hidden_layers": 2
+        },
+        "PascalVOC-SP": {
+            "hidden_channels": 8,
+            "heads": 8,
+            "hidden_layers": 2
+        },
+        "Enzymes": {
+            "hidden_channels": 8,
+            "heads": 8,
+            "hidden_layers": 2
+        }
+    },
+    "GPS": {
+        "Cora": {
+            "hidden_channels": 4,
+            "pe_channels": 5,
+            "num_attention_heads": 2,
+            "num_layers": 3
+        },
+        "IMDB-BINARY": {
+            "hidden_channels": 4,
+            "pe_channels": 5,
+            "num_attention_heads": 2,
+            "num_layers": 3
+        },
+        "PascalVOC-SP": {
+            "hidden_channels": 4,
+            "pe_channels": 5,
+            "num_attention_heads": 2,
+            "num_layers": 3
+        },
+        "Enzymes": {
+            "hidden_channels": 4,
+            "pe_channels": 5,
+            "num_attention_heads": 2,
+            "num_layers": 3
+        }
+    },
+    "GCN": {
+        "Cora": {
+            "hidden_channels": 16,
+            "hidden_layers": 2
+        },
+        "IMDB-BINARY": {
+            "hidden_channels": 16,
+            "hidden_layers": 2
+        },
+        "PascalVOC-SP": {
+            "hidden_channels": 16,
+            "hidden_layers": 2
+        },
+        "Enzymes": {
+            "hidden_channels": 16,
+            "hidden_layers": 2
+        }
+    },
+    "GIN": {
+        "Cora": {
+            "hidden_channels": 16,
+            "hidden_layers": 3
+        },
+        "IMDB-BINARY": {
+            "hidden_channels": 32,
+            "hidden_layers": 3
+        },
+        "PascalVOC-SP": {
+            "hidden_channels": 16,
+            "hidden_layers": 3
+        },
+        "Enzymes": {
+            "hidden_channels": 32,
+            "hidden_layers": 3
+        }
+    }
+}
