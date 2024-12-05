@@ -12,7 +12,8 @@ We supply a Docker image to run our benchmark. The output of `run.py` will be se
 > **⚠️ Notice:** Please expect a longer initial image pull. We find that baking the raw data into the image is faster than loading and processing at runtime. Training times can also vary given your machine's allocated CPU and RAM. GraphGPS, the transformer model, may take the longest due to its multi-head, global attention mechanism. Train and test accuracies can slightly differ as well, since our implementation shuffles datasets prior to splits.
 
 ```
-docker run --name my-local-benchmark message-passing-neural-network-vs-graph-transformer-benchmark:latest
+docker pull ghcr.io/ryanhungry/gnn-benchmark-image:latest
+docker run --name my-local-benchmark ghcr.io/ryanhungry/gnn-benchmark-image:latest
 ```
 
 To see `outputs/results.json` once the container finishes running the model, copy the file from the exited container to your local filesystem.
@@ -22,7 +23,7 @@ docker cp <container_id>:/usr/local/message-pasing-neural-network-vs-graph-trans
 ```
 
 ## Configuration
-We supply a `params.json` configuration file to pass in model parameters, organized by model and dataset type. The base hyperparameter configuration follows our setup in our [paper](www.xyz.com), so the results can be reproduced without additional configuration.
+We supply a `params.json` configuration file to pass in model parameters, organized by model and dataset type. The base hyperparameter configuration follows our setup in our report, so the results can be reproduced without additional configuration.
 
 To supply your own custom set of hyperparameters, clone this repository and edit `params.json` locally. Ensure field names are not changed, and that only JSON integer field types are used. Then, mount your `params.json` as a volume into the container during runtime.
 
