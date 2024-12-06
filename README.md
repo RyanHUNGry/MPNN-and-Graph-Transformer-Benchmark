@@ -14,8 +14,8 @@ We supply a Docker image to run our benchmark. The output of `run.py` will be se
 > **⚠️ Notice:** Please expect a longer initial image pull. We find that baking the raw data into the image is faster than loading and processing at runtime. Training times can also vary given your machine's allocated CPU and RAM. GraphGPS, the transformer model, may take the longest due to its multi-head, global attention mechanism. Train and test accuracies can slightly differ as well, since our implementation shuffles datasets prior to splits.
 
 ```
-docker pull ghcr.io/ryanhungry/gnn-benchmark-image:latest
-docker run --name my-local-benchmark ghcr.io/ryanhungry/gnn-benchmark-image:latest
+docker pull ghcr.io/ryanhungry/message-passing-neural-network-vs-graph-transformer-benchmark:latest
+docker run --name my-local-benchmark ghcr.io/ryanhungry/message-passing-neural-network-vs-graph-transformer-benchmark:latest
 ```
 
 To see `outputs/results.json` once the container finishes running the model, copy the file from the exited container to your local filesystem.
